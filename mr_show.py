@@ -4,16 +4,25 @@ import urllib
 import http.cookiejar
 from bs4 import BeautifulSoup
 import re
+'''
+show class
+'''
 class mr_show(object):
+    schedule='http://jw.hzau.edu.cn/xskbcx.aspx?xh=2013307201006&xm=%B3%CC%CA%E9%D2%E2&gnmkdm=N121603'
+    
+    #School year and Semester
+    schoolYear='2015-2016'
+    semester='2'
+    
     def __init__(self):
         FileCookie='D:\\workspace\\python\\hzau\\course\\config\\cookie.conf'
-        self.cj=http.cookiejar.LWPCookieJar()
-        self.cookie_support=urllib.request.HTTPCookieProcessor(self.cj)
-        self.opener=urllib.request.build_opener(self.cookie_support,urllib.request.HTTPHandler)
-        urllib.request.install_opener(self.opener)
-        self.cj.load(FileCookie, ignore_discard=True, ignore_expires=True)
-    def getView(self):
-        reqURL='http://jw.hzau.edu.cn/xf_xsqxxxk.aspx?xh=2013307201006&xm=%B3%CC%CA%E9%D2%E2&gnmkdm=N121111'
+        cj=http.cookiejar.LWPCookieJar()
+        cookie_support=urllib.request.HTTPCookieProcessor(cj)
+        opener=urllib.request.build_opener(cookie_support,urllib.request.HTTPHandler)
+        urllib.request.install_opener(opener)
+        cj.load(FileCookie, ignore_discard=True, ignore_expires=True)
+    
+    def getView(self,url):
         headers={
             'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
             'Accept-Encoding':'gzip, deflate, sdch',
@@ -26,53 +35,25 @@ class mr_show(object):
             'Upgrade-Insecure-Requests':'1',
             'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36'
         }
-        req=urllib.request.Request(reqURL,headers=headers)
-        f=urllib.request.urlopen(req,timeout=10)
-        html=f.read().decode('gbk')
-        soup=BeautifulSoup(html,'html.parser')
-        soup=soup.find_all(attrs={'name':'__VIEWSTATE'})[0]
-        viewstate=soup.get('value')
-        #print(html)
+        viewstate=None
+        req=urllib.request.Request(url,headers=headers)
+        while viewstate is None:
+            try:
+                html=urllib.request.urlopen(req, timeout=3).read().decode('gbk')
+                soup=BeautifulSoup(html,'html.parser')
+                try:
+                    soup=soup.find_all(attrs={'name':'__VIEWSTATE'})[0]
+                    viewstate=soup.get('value')
+                except:
+                    print('get response but cant get VIEWSTATE')
+                    continue
+            except:
+                print('get schedule has not accepted response')
+                continue
         return viewstate
-        form={
-            '__EVENTTARGET':'',
-            '__EVENTARGUMENT':'',
-            '__VIEWSTATE':viewstate,
-            'ddl_kcxz':'',
-            'ddl_ywyl':'有',
-            'ddl_kcgs':'自然科学',#select sort 人文科学
-            'ddl_xqbs':1,
-            'ddl_sksj':'',
-            'TextBox1':'',
-            'kcmcGrid:_ctl2:jcnr':'|||',#11
-            'kcmcGrid:_ctl3:jcnr':'|||',
-            'kcmcGrid:_ctl4:xk':'|||',
-            'kcmcGrid:_ctl4:jcnr':'|||',
-            'kcmcGrid:_ctl5:xk':'|||',
-            'kcmcGrid:_ctl5:jcnr':'|||',
-            'kcmcGrid:_ctl6:jcnr':'|||',
-            'kcmcGrid:_ctl7:jcnr':'|||',
-            'kcmcGrid:_ctl8:jcnr':'|||',
-            'kcmcGrid:_ctl9:jcnr':'|||',
-            'kcmcGrid:_ctl10:jcnr':'|||',
-            'kcmcGrid:_ctl11:jcnr':'|||',
-            'kcmcGrid:_ctl12:jcnr':'|||',
-            'kcmcGrid:_ctl13:jcnr':'|||',
-            'kcmcGrid:_ctl14:jcnr':'|||',
-            'kcmcGrid:_ctl15:jcnr':'|||',
-            'kcmcGrid:_ctl16:jcnr':'|||',
-            'dpkcmcGrid:txtChoosePage':4,
-            'dpkcmcGrid:txtPageSize':15,
-        }
-        #post_data=urllib.parse.urlencode(form).encode(encoding='utf-8')
-        #req=urllib.request.Request(reqURL,post_data,headers)
-        #f=urllib.request.urlopen(req,timeout=10)
-        #html=f.read().decode('gbk')
-        #soup=BeautifulSoup(html,'html.parser')
-        #soup=soup.find_all(attrs={'name':'__VIEWSTATE'})[0]
-        #viewstate=soup.get('value')
-        return viewstate
-    def choseClass(self,qid=10):
+    # only get the html not filter
+    # finish this maybe you should see someting in demo.py
+    def showClass(self):
         headers={
             'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
             'Accept-Encoding':'gzip, deflate',
@@ -83,65 +64,17 @@ class mr_show(object):
             'Host':'jw.hzau.edu.cn',
             'Origin':'http://jw.hzau.edu.cn',
             'Pragma':'no-cache',
-            'Referer':'http://jw.hzau.edu.cn/xf_xsqxxxk.aspx?xh=2013307201006&xm=%B3%CC%CA%E9%D2%E2&gnmkdm=N121111',
-            'Upgrade-Insecure-Requests':1,
+            'Referer':'http://jw.hzau.edu.cn/xskbcx.aspx?xh=2013307201006&xm=%B3%CC%CA%E9%D2%E2&gnmkdm=N121603',
+            'Upgrade-Insecure-Requests':'1',
             'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36'
-        }
-        reqURL='http://jw.hzau.edu.cn/xf_xsqxxxk.aspx?xh=2013307201006&xm=%B3%CC%CA%E9%D2%E2&gnmkdm=N121111'
-        while True:
-            viewstate=self.getView()
-            if viewstate:
-                break
+            }
         form={
-            '__EVENTTARGET':'',
+            '__EVENTTARGET':'xqd',
             '__EVENTARGUMENT':'',
-            '__VIEWSTATE':viewstate,
-            'ddl_kcxz':'',
-            'ddl_ywyl':'有',
-            'ddl_kcgs':'自然科学',#select sort 人文科学
-            'ddl_xqbs':1,
-            'ddl_sksj':'',
-            'TextBox1':'',
-            'kcmcGrid:_ctl2:jcnr':'|||',#11
-            'kcmcGrid:_ctl3:jcnr':'|||',
-            'kcmcGrid:_ctl4:xk':'on',
-            'kcmcGrid:_ctl4:jcnr':'|||',
-            'kcmcGrid:_ctl5:xk':'on',
-            'kcmcGrid:_ctl5:jcnr':'|||',
-            'kcmcGrid:_ctl6:jcnr':'|||',
-            'kcmcGrid:_ctl7:jcnr':'|||',
-            'kcmcGrid:_ctl8:jcnr':'|||',
-            'kcmcGrid:_ctl9:jcnr':'|||',
-            'kcmcGrid:_ctl10:jcnr':'|||',
-            'kcmcGrid:_ctl11:jcnr':'|||',
-            'kcmcGrid:_ctl12:jcnr':'|||',
-            'kcmcGrid:_ctl13:jcnr':'|||',
-            'kcmcGrid:_ctl14:jcnr':'|||',
-            'kcmcGrid:_ctl15:jcnr':'|||',
-            'kcmcGrid:_ctl16:jcnr':'|||',
-            'dpkcmcGrid:txtChoosePage':2,
-            'dpkcmcGrid:txtPageSize':15,
-            'Button1':'提交'
-        }
-        post_data=urllib.parse.urlencode(form).encode(encoding='utf-8')
-        req=urllib.request.Request(reqURL,post_data,headers)
-        try:
-            f=urllib.request.urlopen(req,timeout=10)
-            if qid%10==0:
-                html=f.read().decode('gbk')
-                print(html)
-                if qid%1000==0:
-                    path='D:\\workspace\\python\\hzau\\course\\config\\allCourse.conf'
-                    file=open(path,'w')
-                    file.write(html)
-                    print('已经写入文件')
-                    file.close()
-                soup=BeautifulSoup(html,'html.parser')
-                try:
-                    print(soup.find_all('fieldset')[1])
-                except:
-                    print('soup list index out of range')
-            else:
-                print('第',qid,'个任务完成')
-        except:
-            print('url cannot open')
+            '__VIEWSTATE':self.getView(self.schedule),
+            'xnd':self.schoolYear,
+            'xqd':self.semester
+            }
+        post_data=urllib.parse.urlencode(form).encode(encoding='utf_8')
+        req=urllib.request.Request(self.schedule,post_data,headers)
+        html=urllib.request.urlopen(req).read().decode('gbk')

@@ -5,32 +5,16 @@ import threading
 import time
 from course.mr_login import mr_login
 from course.mr_show import mr_show
+from course.mr_select import mr_select
 
-class ThreadClass(threading.Thread):
-    def __init__(self,qe,show):
-        threading.Thread.__init__(self)
-        self.qe = qe
-        self.show=show
-    def run(self):
-        while True:
-            qid=self.qe.get()
-            self.show.choseClass(qid)
-            self.qe.task_done()
 
 def main():
     mrlogin=mr_login()
     if mrlogin.door():
-        print('login successfully!')
-        mrshow =mr_show()
-        mrshow.choseClass()
-        '''qe=queue.Queue()
-        for i in range(1):
-            t = ThreadClass(qe,mrshow)
-            t.setDaemon(True)
-            t.start()
-        for i in range(1):
-            qe.put(i)
-        qe.join()'''
+        #mrshow=mr_show()
+        #print(mrshow.showClass())
+        mrselect=mr_select('\327\324\310\273\277\306\321\247')#people cuture
+        mrselect.door()
 if __name__=='__main__':
     st=time.time()
     main()
