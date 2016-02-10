@@ -22,8 +22,8 @@ class mr_login(object):
     codeImg='D:\\aaaaa\\code.gif'
     
     #username and password
-    username='2013307201006'
-    password='qq520.1314'
+    username=''
+    password=''
     
     #init fileCookieJar and install_opener
     def __init__(self):
